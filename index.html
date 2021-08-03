@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+    <html class="full-screen noscroll" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="mobile-web-app-capable" content="yes">
+
+        <meta name="description" content="Company Directory">
+        <meta name="keywords" content="directory, relational, database, SQL, MariaDB, DBMS, HTML, HTML5, CSS, CSS3, JavaScript, jQuery, Bootstrap, web, app, PHP, AJAX">
+        <meta name="author" content="Chris Walker">
+
+        <!-- Favicons -->
+        <link rel="apple-touch-icon" sizes="180x180" href="./resources/img/favicons/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="./resources/img/favicons/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="./resources/img/favicons/favicon-16x16.png">
+        <link rel="manifest" href="./resources/img/favicons/site.webmanifest">
+        <link rel="mask-icon" href="./resources/img/favicons/safari-pinned-tab.svg" color="#5bbad5">
+        <link rel="shortcut icon" href="./resources/img/favicons/favicon.ico">
+        <meta name="msapplication-TileColor" content="#da532c">
+        <meta name="msapplication-config" content="./resources/img/favicons/browserconfig.xml">
+        <meta name="theme-color" content="#ffffff">
+
+        <!-- Bootstrap 5.0.2 CSS -->
+        <link rel="stylesheet" href="./vendors/css/bootstrap.min.css">
+        <!-- Font Awesome CSS -->
+        <link rel="stylesheet" type="text/css" href="./vendors/css/all.css">
+        <!-- Main styles CSS -->
+        <link rel="stylesheet" type="text/css" href="./resources/css/style.min.css">
+
+        <title>Company Directory</title>
+    </head>
+
+    <body class="full-screen noscroll">
+
+        <!-- Preloader and 'busy' spinner -->
+        <div class="preloader-init" id="preloader">
+            <div class="circle">
+                <div class="circle1 child"></div>
+                <div class="circle2 child"></div>
+                <div class="circle3 child"></div>
+                <div class="circle4 child"></div>
+                <div class="circle5 child"></div>
+                <div class="circle6 child"></div>
+                <div class="circle7 child"></div>
+                <div class="circle8 child"></div>
+                <div class="circle9 child"></div>
+                <div class="circle10 child"></div>
+                <div class="circle11 child"></div>
+                <div class="circle12 child"></div>
+            </div>
+        </div>
+
+        <!-- Main Bootstrap container -->
+        <div class="container-fluid full-screen d-flex flex-column">
+
+            <!-- First row - header -->
+            <div class="row header-row d-flex">
+                <div class="col-12">
+                    <nav class="navbar navbar-expand-lg navbar-dark">
+                        <div class="container-fluid p-0" id="maintenance-nav-container">
+
+                            <!-- Header logo -->
+                            <div class="navbar-brand">
+                                <div id="header-logo">
+                                    <a href="https://chrismwalker.co.uk" target="_blank">
+                                        <img src="./resources/img/company-directory-logo.png" class="img-fluid" alt="Company Directory" aria-label="Company Directory">
+                                    </a>
+                                </div>
+                            </div>
+
+                            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#maintenance-nav" aria-controls="maintenance-nav" aria-expanded="false" aria-label="Toggle navigation">
+                                <span class="navbar-toggler-icon"></span>
+                            </button>
+
+                            <div class="collapse navbar-collapse justify-content-end" id="maintenance-nav">
+                                <ul class="navbar-nav">
+                                    <li class="nav-item mt-3 mt-lg-0 mb-2 mb-lg-0 me-lg-3">
+
+                                        <!-- Personnel search box -->
+                                        <form action="./resources/php/searchAllPersonnel.php" method="POST" id="search-personnel-form">
+                                            <div class="input-group">
+                                                <label class="sr-only" for="personnel-search-input"></label>
+                                                <input class="form-control border-0" type="search" placeholder="Search personnel..." aria-label="Personnel search" id="personnel-search-input" name="personnel-search-input" minlength="2" maxlength="50" required>
+                                                <span class="input-group-append">
+                                                    <button type="submit" class="btn btn-outline-secondary bg-white border-0" id="personnel-search-button">
+                                                        <i class="fas fa-search"><span class="sr-only">Search Personnel</span></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-secondary bg-white border-0" id="personnel-refresh-button" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-offset="0,10" data-bs-custom-class="tt-add" title="Refresh Personnel">
+                                                        <i class="fas fa-redo-alt"><span class="sr-only">Refresh Personnel List</span></i>
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </form>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link active" id="personnel-nav-link" aria-current="page" href="#">Personnel</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="departments-nav-link" href="#">Departments</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="locations-nav-link" href="#">Locations</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Second row - main data area -->
+            <div class="row main-row d-flex flex-fill overflow-auto mt-3 mb-3">
+                <div class="col-12">
+
+                    <!-- Personnel table -->
+
+                    <div class="table-responsive table-wrapper" id="personnel-table-wrapper">
+                        <table class="table table-striped table-hover" id="personnel-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="d-none d-lg-table-cell">ID
+                                        <i class="sort fas fa-sort" id="sort-personnel-id" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-offset="0,10" data-bs-custom-class="tt-add" data-sort="ASC" title="Sort ID"></i>
+                                    </th>
+                                    <th scope="col">Name
+                                        <i class="sort fas fa-sort" id="sort-personnel-lastName" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-offset="0,10" data-bs-custom-class="tt-add" data-sort="ASC" title="Sort Name"></i>
+                                    </th>
+                                    <th scope="col" class="d-none d-lg-table-cell">Email
+                                        <i class="sort fas fa-sort" id="sort-personnel-email" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-offset="0,10" data-bs-custom-class="tt-add" data-sort="ASC" title="Sort Email"></i>
+                                    </th>
+                                    <th scope="col" class="d-none d-lg-table-cell">Department
+                                        <i class="sort fas fa-sort" id="sort-personnel-department" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-offset="0,10" data-bs-custom-class="tt-add" data-sort="ASC" title="Sort Department"></i>
+                                    </th>
+                                    <th scope="col" class="d-none d-lg-table-cell">Location
+                                        <i class="sort fas fa-sort" id="sort-personnel-location" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-offset="0,10" data-bs-custom-class="tt-add" data-sort="ASC" title="Sort Location"></i>
+                                    </th>
+                                    <th scope="col" class="d-none d-lg-table-cell">Job Title
+                                        <i class="sort fas fa-sort" id="sort-personnel-jobTitle" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-offset="0,10" data-bs-custom-class="tt-add" data-sort="ASC" title="Sort Job Title"></i>
+                                    </th>
+                                    <th scope="col" class="td-icon text-end"><i class="fas fa-plus-circle" id="add-personnel-icon" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-offset="0,10" data-bs-custom-class="tt-add" title="Add Personnel"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Departments table -->
+
+                    <div class="table-responsive table-wrapper hide" id="departments-table-wrapper">
+                        <table class="table table-striped table-hover" id="departments-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Department Name
+                                        <i class="sort fas fa-sort" id="sort-department-name" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-offset="0,10" data-bs-custom-class="tt-add" data-sort="ASC" title="Sort Name"></i>
+                                    </th>
+                                    <th scope="col" class="d-none d-lg-table-cell">Location
+                                        <i class="sort fas fa-sort" id="sort-department-location" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-offset="0,10" data-bs-custom-class="tt-add" data-sort="ASC" title="Sort Location"></i>
+                                    </th>
+                                    <th scope="col" class="td-icon text-end"><i class="fas fa-plus-circle" id="add-department-icon" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-offset="0,10" data-bs-custom-class="tt-add" title="Add Department"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Locations table -->
+
+                    <div class="table-responsive table-wrapper hide" id="locations-table-wrapper">
+                        <table class="table table-striped table-hover" id="locations-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Location Name
+                                        <i class="sort fas fa-sort" id="sort-location-name" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-offset="0,10" data-bs-custom-class="tt-add" data-sort="ASC" title="Sort Name"></i>
+                                    </th>
+                                    <th scope="col" class="td-icon text-end"><i class="fas fa-plus-circle" id="add-location-icon" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-offset="0,10" data-bs-custom-class="tt-add" title="Add Location"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Third row - footer containing record count -->
+            <div class="row footer-row d-flex">
+                <div class="col-auto">
+                    <!-- Record count -->
+                    <p class="mt-0 mb-0 pt-1 pb-1" id="personnel-row-count"></p>
+                </div>
+            </div>
+
+            <!-- Fixed icons - hidden by default, appear on main row scroll down -->
+            <i class="icon-fixed fas fa-chevron-up" id="backtop-icon-fixed" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-offset="0,10" data-bs-custom-class="tt-default" title="Back To Top"></i>
+            <i class="icon-fixed fas fa-plus" id="add-record-icon-fixed" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-offset="0,10" data-bs-custom-class="tt-add" title="Add Personnel"></i>
+
+        </div>
+
+        <!-- Add/update personnel modal -->
+        <div class="modal fade" id="personnelModal" tabindex="-1" aria-labelledby="personnel-modal-title" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-2">
+                    <div class="modal-header">
+                        <h5 class="modal-title hide" id="personnel-modal-title">Maintain Personnel</h5>
+                        <h5 class="modal-title modal-title-add-record hide" id="add-personnel-modal-title">Add Personnel</h5>
+                        <h5 class="modal-title modal-title-update-record hide" id="update-personnel-modal-title"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="./resources/php/insertUpdatePersonnel.php" method="POST" id="personnel-form">
+                            <div class="table-responsive">
+                                <table class="table table-borderless">
+                                    <tbody>
+                                        <tr class="hide">
+                                            <th scope="row" class="hide"><label for="update-personnel-id" class="hide">ID:</label></th>
+                                            <td class="hide"><input type="text" class="w-100 hide" id="update-personnel-id" name="update-personnel-id"></td>
+                                        </tr>
+                                        <tr class="hide">
+                                            <th scope="row" class="hide"><label for="update-personnel-name" class="hide">Name:</label></th>
+                                            <td class="hide"><input type="text" class="w-100 hide" id="update-personnel-name" name="update-personnel-name"></td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row"><label for="personnel-first-name">First Name:</label></th>
+                                            <td><input type="text" class="w-100" id="personnel-first-name" name="personnel-first-name" maxlength="50" required></td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row"><label for="personnel-last-name">Last Name:</label></th>
+                                            <td><input type="text" class="w-100" id="personnel-last-name" name="personnel-last-name" maxlength="50" required></td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row"><label for="personnel-email">Email:</label></th>
+                                            <td><input type="email" class="w-100" id="personnel-email" name="personnel-email" maxlength="50" required></td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row"><label for="personnel-department">Department:</label></th>
+                                            <td><select class="w-100" id="personnel-department" name="personnel-department"></td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row"><label for="personnel-location">Location:</label></th>
+                                            <td><input type="text" class="w-100" id="personnel-location" name="personnel-location" disabled></td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row"><label for="personnel-job-title">Job Title:</label></th>
+                                            <td><input type="text" class="w-100" id="personnel-job-title" name="personnel-job-title" maxlength="50" required></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary btn-save" id="personnel-save-button" form="personnel-form">Save</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add/update department modal -->
+        <div class="modal fade" id="departmentModal" tabindex="-1" aria-labelledby="department-modal-title" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-2">
+                    <div class="modal-header">
+                        <h5 class="modal-title hide" id="department-modal-title">Maintain Department</h5>
+                        <h5 class="modal-title modal-title-add-record hide" id="add-department-modal-title">Add Department</h5>
+                        <h5 class="modal-title modal-title-update-record hide" id="update-department-modal-title"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="./resources/php/insertUpdateDepartment.php" method="POST" id="department-form">
+                            <div class="table-responsive">
+                                <table class="table table-borderless">
+                                    <tbody>
+                                        <tr class="hide">
+                                            <th scope="row" class="hide"><label for="update-department-id" class="hide">ID:</label></th>
+                                            <td class="hide"><input type="text" class="w-100 hide" id="update-department-id" name="update-department-id"></td>
+                                        </tr>
+                                        <tr class="hide">
+                                            <th scope="row" class="hide"><label for="update-department-name" class="hide">Department Name:</label></th>
+                                            <td class="hide"><input type="text" class="w-100 hide" id="update-department-name" name="update-department-name"></td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row"><label for="department-name">Department Name:</label></th>
+                                            <td><input type="text" class="w-100" id="department-name" name="department-name" maxlength="50" required></td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row"><label for="department-location">Location:</label></th>
+                                            <td><select class="w-100" id="department-location" name="department-location"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary btn-save" id="department-save-button" form="department-form">Save</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add/update location modal -->
+        <div class="modal fade" id="locationModal" tabindex="-1" aria-labelledby="location-modal-title" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-2">
+                    <div class="modal-header">
+                        <h5 class="modal-title hide" id="location-modal-title">Maintain Location</h5>
+                        <h5 class="modal-title modal-title-add-record hide" id="add-location-modal-title">Add Location</h5>
+                        <h5 class="modal-title modal-title-update-record hide" id="update-location-modal-title"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="./resources/php/insertUpdateLocation.php" method="POST" id="location-form">
+                            <div class="table-responsive">
+                                <table class="table table-borderless">
+                                    <tbody>
+                                        <tr class="hide">
+                                            <th scope="row" class="hide"><label for="update-location-id" class="hide">ID:</label></th>
+                                            <td class="hide"><input type="text" class="w-100 hide" id="update-location-id" name="update-location-id"></td>
+                                        </tr>
+                                        <tr class="hide">
+                                            <th scope="row" class="hide"><label for="update-location-name" class="hide">Location Name:</label></th>
+                                            <td class="hide"><input type="text" class="w-100 hide" id="update-location-name" name="update-location-name"></td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row"><label for="location-name">Location Name:</label></th>
+                                            <td><input type="text" class="w-100" id="location-name" name="location-name" maxlength="50" required></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary btn-save" id="location-save-button" form="location-form">Save</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error modal -->
+        <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="error-modal-title" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-2">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="error-modal-title">Error</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="hide" id="error-description"></p>
+                        <p>Please try again</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search - No Match Found modal -->
+        <div class="modal fade" id="searchNoMatchModal" tabindex="-1" aria-labelledby="search-modal-title" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-2">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="search-modal-title">Search</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>No matching records found</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirm modal -->
+        <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirm-modal-title" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-2">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirm-modal-title">Confirm</h5>
+                        <button type="button" class="btn-close" id="confirm-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mt-0 mb-0">Are you sure?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="confirm-yes">Yes</button>
+                        <button type="button" class="btn btn-secondary" id="confirm-no" data-bs-dismiss="modal">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success toast -->
+        <div class="toastWrapper position-fixed bottom-0 start-50 translate-middle-x p-3">
+            <div id="successToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <i class="fas fa-check me-2"></i>
+                    <strong class="me-auto">Success</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    <p class="mt-0 mb-0" id="success-toast-text"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- jQuery -->
+        <script src="./vendors/js/jquery-3.6.0.min.js"></script>
+        <!-- Bootstrap 5.0.2 -->
+        <script src="./vendors/js/bootstrap.bundle.min.js"></script>
+        <!-- Main JavaScript -->
+        <script src="./resources/js/script.min.js"></script>
+
+    </body>
+</html>
