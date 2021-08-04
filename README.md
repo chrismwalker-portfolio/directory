@@ -21,9 +21,9 @@
 * Error handling across the application, displaying meaningful error messages in the user interface for failed database connections, inability to retrieve/update data, attempts to violate foreign key constraints, etc.
 
 ## Screenshots
-<img src="resources/img/screenshots/directory-screenshot-1.jpg" alt="Gazetteer screenshot 1" width="400">
-<img src="resources/img/screenshots/directory-screenshot-2.jpg" alt="Gazetteer screenshot 2" width="400">
-<img src="resources/img/screenshots/directory-screenshot-3.jpg" alt="Gazetteer screenshot 3" width="400">
+<img src="resources/img/screenshots/directory-screenshot-1.jpg" alt="Company Directory screenshot 1" width="600">
+<img src="resources/img/screenshots/directory-screenshot-2.jpg" alt="Company Directory screenshot 2" width="600">
+<img src="resources/img/screenshots/directory-screenshot-3.jpg" alt="Company Directory screenshot 3" width="600">
 
 ## Technologies
 * HTML5
