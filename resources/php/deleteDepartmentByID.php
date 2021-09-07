@@ -46,19 +46,37 @@
 
 	}
 
-	/* Check if at least one personnel record attached to this department was found */
+	/* Get the total number of personnel records attached */
 
 	$total = intval(mysqli_fetch_assoc($result)["total"]);
 
-	if ($total > 0) {
+	/* If only checking for foreign key relationships, and no personnel records are attached, return here */
 
-		/* Build link for foreign key relationship list */
-		$fk = '<a tabindex="0" class="fkPopover" data-table="personnel" data-id="' . $_POST['id'] . '" data-bs-toggle="popover" data-bs-placement="top" data-bs-trigger="focus" title="Still attached..." data-bs-content="">';
+	if (isset($_POST['checkFK']) && $_POST['checkFK'] && $total < 1) {
+
+		$output['status']['code'] = "200";
+		$output['status']['name'] = "OK";
+		$output['status']['description'] = "No personnel in this department";
+		$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+		$output['data'] = [];
+
+		mysqli_close($conn);	
+		echo json_encode($output);
+		exit;
+
+	}
+
+	/* If at least one personnel record is attached to this department, return an error */
+
+	if ($total > 0) {
 
 		$output['status']['code'] = "400";
 		$output['status']['name'] = "executed";
-		$output['status']['description'] = "Unable to delete department as it still has " . $fk . $total . " personnel</a> attached";
-		$output['data'] = [];
+		$output['status']['description'] = "Unable to delete department as it still has personnel attached";
+		$output['data']['id'] = $_POST['id'];
+		$output['data']['table'] = 'personnel';
+		$output['data']['text'] = 'personnel';
+		$output['data']['count'] = $total;
 
 		mysqli_close($conn);
 		echo json_encode($output);

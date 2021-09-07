@@ -46,21 +46,37 @@
 
 	}
 
-	/* Check if at least one department record attached to this location was found */
+	/* Get the total number of department records attached */
 
 	$total = intval(mysqli_fetch_assoc($result)["total"]);
 
+	/* If only checking for foreign key relationships, and no department records are attached, return here */
+
+	if (isset($_POST['checkFK']) && $_POST['checkFK'] && $total < 1) {
+
+		$output['status']['code'] = "200";
+		$output['status']['name'] = "OK";
+		$output['status']['description'] = "No departments at this location";
+		$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+		$output['data'] = [];
+
+		mysqli_close($conn);	
+		echo json_encode($output);
+		exit;
+
+	}
+
+	/* If at least one department record is attached to this location, return an error */
+
 	if ($total > 0) {
-
-		/* Build link for foreign key relationship list */
-		$fk = '<a tabindex="0" class="fkPopover" data-table="department" data-id="' . $_POST['id'] . '" data-bs-toggle="popover" data-bs-placement="top" data-bs-trigger="focus" title="Still attached..." data-bs-content="">';
-
-		$departmentText = $total > 1 ? "departments" : "department";
 
 		$output['status']['code'] = "400";
 		$output['status']['name'] = "executed";
-		$output['status']['description'] = "Unable to delete location as it still has " . $fk . $total . " " . $departmentText . "</a> attached";
-		$output['data'] = [];
+		$output['status']['description'] = "Unable to delete location as it still has department attached";
+		$output['data']['id'] = $_POST['id'];
+		$output['data']['table'] = 'department';
+		$output['data']['text'] = $total > 1 ? "departments" : "department";
+		$output['data']['count'] = $total;
 
 		mysqli_close($conn);
 		echo json_encode($output);

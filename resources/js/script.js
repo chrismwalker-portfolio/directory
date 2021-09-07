@@ -21,7 +21,7 @@ $(document).ready(function() {
             $('#error-description').text('').addClass('hide');
 
             if (error instanceof Error) {
-                $('#error-description').text(error.message).removeClass('hide');
+                $('#error-description').html(error.message).removeClass('hide');
             } else if (error.status.description) {
                 $('#error-description').html(error.status.description).removeClass('hide');
             }
@@ -65,6 +65,9 @@ $(document).ready(function() {
                                 // Display the table
                                 displayTable($('#personnel-table-wrapper'));
 
+                                // Show/hide the fixed icons depending on table scroll position
+                                manageFixedIcons();
+
                                 // Set the active navbar menu link to 'Personnel'
                                 $('#maintenance-nav').find('.active').removeClass('active');
                                 $('#personnel-nav-link').addClass('active');
@@ -95,15 +98,18 @@ $(document).ready(function() {
                             case 'deleteDepartmentByID':
                             case 'insertUpdateLocation':
                             case 'deleteLocationByID':
-        
-                                // Show 'success' toast
-                                displayToast(response.status.description);
 
-                                // Refresh the list of records
-                                if (action.indexOf('Department') >= 0) {
-                                    $('#departments-nav-link').trigger('click');
-                                } else {
-                                    $('#locations-nav-link').trigger('click');
+                                if (!('checkFK' in data)) {
+
+                                    // Show 'success' toast
+                                    displayToast(response.status.description);
+
+                                    // Refresh the list of records
+                                    if (action.indexOf('Department') >= 0) {
+                                        $('#departments-nav-link').trigger('click');
+                                    } else {
+                                        $('#locations-nav-link').trigger('click');
+                                    }
                                 }
 
                                 break;
@@ -236,6 +242,34 @@ $(document).ready(function() {
         $('#confirm-no').add('#confirm-close').attr('data-bs-toggle', 'modal').attr('data-bs-target', `#${element}`);
     };
 
+    // Show the fixed icons when scrolling down a table, hide them at the top
+    const manageFixedIcons = () => {
+
+        if ($('.table-wrapper').not('.hide').scrollTop() > 50 && !$('.icon-fixed').hasClass('.icon-fixed-grow')) {
+            $('.icon-fixed').addClass('icon-fixed-grow');
+        } else if ($('.table-wrapper').not('.hide').scrollTop() <= 50) {
+            $('.icon-fixed').removeClass('icon-fixed-grow');
+        }    
+    };
+
+    // Build a link to fetch foreign key related records
+    const buildFKLink = (id, table, text, count) => {
+
+        return $(document.createElement('a'))
+            .attr({
+                tabindex: '0',
+                class: 'fkPopover',
+                title: 'Still attached...',
+                'data-table': table,
+                'data-id': id,
+                'data-bs-toggle': 'popover',
+                'data-bs-placement': 'top',
+                'data-bs-trigger': 'focus',
+                'data-bs-content': ''
+            })
+            .text(count + ' ' + text);
+    };
+
     // Check if app is running on a touch-screen device
     const isTouchDevice = () => {
         return ('ontouchstart' in window);
@@ -275,29 +309,25 @@ $(document).ready(function() {
         hideSpinner();
     });
 
-    // Scroll the main data area
-    $('.main-row').on('scroll', function() {
-
-        // Show the fixed icons when scrolling down, hide them at top
-        if ($('.main-row').scrollTop() > 50 && !$('.main-row').hasClass('.icon-fixed-grow')) {
-            $('.icon-fixed').addClass('icon-fixed-grow');
-        } else if ($('.main-row').scrollTop() <= 50) {
-            $('.icon-fixed').removeClass('icon-fixed-grow');
-        }
-    });
-
     // Click 'Scroll To Top' fixed icon
     $('#backtop-icon-fixed').on('click', function() {
 
         // Close any open tooltips
         $('.tooltip').tooltip('hide');
 
-        $('.main-row').animate({ scrollTop: 0 }, 'fast');
+        $('.table-wrapper').not('.hide').animate({ scrollTop: 0 }, 'fast');
     });
 
     /* ============ */
     /* TABLE EVENTS */
     /* ============ */
+
+    // Scroll a table
+    $('.table-wrapper').on('scroll', function() {
+
+        // Show the fixed icons when scrolling down, hide them at the top
+        manageFixedIcons();
+    });
 
     // Click a column sort button
     $('.sort').on('click', function() {
@@ -554,9 +584,39 @@ $(document).ready(function() {
                 titleText = $(this).find('.location-name').text();
             }
 
+            // Set the attributes for the 'Confirm delete' modal
             $('#confirm-yes').attr({ 'data-action': dataAction, 'data-id': $(this).attr('data-id') });
             $('#confirm-modal-title').text(`Delete ${titleText}`);
-            $('#confirmModal').modal('show');
+
+            // If deleting department or location, check for related records before showing 'Confirm delete' modal
+            if (dataAction === 'deleteDepartmentByID' || dataAction === 'deleteLocationByID') {
+
+                connectDB({
+                    action: dataAction,
+                    errorType: `${dataAction}Error`,
+                    data: {
+                        id: $(this).attr('data-id'),
+                        checkFK: true
+                    }
+                })
+                    .then(() => {
+                        $('#confirmModal').modal('show');
+                    })
+                    .catch((error) => {
+
+                        if (error.data) {
+
+                            // Build error text containing the link to the foreign key records and raise an error
+                            const fkLink = buildFKLink(error.data.id, error.data.table, error.data.text, error.data.count);
+                            const errorText = error.status.description.replace(error.data.table, fkLink[0].outerHTML);
+                            handleError.raiseError(new Error(errorText));
+                        } else {
+                            handleError.raiseError(error);
+                        }
+                    });
+            } else {
+                $('#confirmModal').modal('show');
+            }
         }
     });
 
@@ -656,8 +716,8 @@ $(document).ready(function() {
     // Close any modal
     $('.modal').on('hidden.bs.modal', function() {
 
-        // Show the fixed icons if the scroll position of the main data area is not at the top
-        if ($('.main-row').scrollTop() > 50) {
+        // Show the fixed icons if the scroll position of the active table is not at the top
+        if ($('.table-wrapper').not('.hide').scrollTop() > 50) {
             $('.icon-fixed').addClass('icon-fixed-grow');
         }
     });
@@ -827,6 +887,9 @@ $(document).ready(function() {
                 // Display the table
                 displayTable(attributes.table);
 
+                // Show/hide the fixed icons depending on table scroll position
+                manageFixedIcons();
+
                 // Collapse the navbar in mobile view
                 $('.navbar-collapse').collapse('hide');
             })
@@ -968,7 +1031,18 @@ $(document).ready(function() {
                     }
                 })
                     .catch((error) => {
-                        handleError.raiseError(error);
+
+                        // Check if error is due to department/location foreign key relationships
+                        if (($('#confirm-yes').attr('data-action') === 'deleteDepartmentByID' || $('#confirm-yes').attr('data-action') === 'deleteLocationByID') && error.data) {
+
+                            // Build error text containing the link to the foreign key records and raise an error
+                            const fkLink = buildFKLink(error.data.id, error.data.table, error.data.text, error.data.count);
+                            const errorText = error.status.description.replace(error.data.table, fkLink[0].outerHTML);
+                            handleError.raiseError(new Error(errorText));
+
+                        } else {
+                            handleError.raiseError(error);
+                        }
                     });
                 break;
         
